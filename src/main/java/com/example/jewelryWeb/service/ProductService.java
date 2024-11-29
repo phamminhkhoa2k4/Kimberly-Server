@@ -52,27 +52,14 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    // Cập nhật sản phẩm
-    public Product updateProduct(Long productId, Product updatedProduct) {
-        return productRepository.findById(productId).map(product -> {
-            product.setProductName(updatedProduct.getProductName());
-            product.setCategory(updatedProduct.getCategory());
-            product.setPrice(updatedProduct.getPrice());
-            product.setMetallicColor(updatedProduct.getMetallicColor());
-            product.setMaterial(updatedProduct.getMaterial());
-            product.setDiscount(updatedProduct.getDiscount());
-            product.setImages(updatedProduct.getImages());
-            product.setIsFeatured(updatedProduct.getIsFeatured());
-            product.setIsActive(updatedProduct.getIsActive());
-            return productRepository.save(product);
-        }).orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
-    }
-
     public List<Product> searchByName(String name) {
         return productRepository.findByProductNameContainingIgnoreCase(name);
     }
 
     public Product createProduct(ProductDTO productDTO) throws IOException {
+        if (isProductNameDuplicate(productDTO.getProductName())) {
+            throw new IllegalArgumentException("Product name already exists: " + productDTO.getProductName());
+        }
         Category category = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Category not found with ID: " + productDTO.getCategoryId()));
@@ -89,7 +76,6 @@ public class ProductService {
             }
         }
 
-        // Tạo Product
         Product product = Product.builder()
                 .productName(productDTO.getProductName())
                 .category(category)
@@ -101,9 +87,6 @@ public class ProductService {
                 .images(String.join(",", imageIds))
                 .isFeatured(productDTO.getIsFeatured())
                 .isActive(productDTO.getIsActive())
-                .Shape(productDTO.getShape())
-                .gender(productDTO.getGender())
-                .isIncludeMasterDiamond(productDTO.getIsIncludeMasterDiamond())
                 .build();
 
         return productRepository.save(product);
@@ -123,39 +106,40 @@ public class ProductService {
         }
         productRepository.delete(product);
     }
-
-    public Product editProduct(Long productId, ProductDTO productDTO) throws IOException {
-        // Tìm sản phẩm theo ID
+    public boolean isProductNameDuplicate(String productName) {
+        return productRepository.existsByProductName(productName);
+    }
+    public Product editProduct(Long productId, ProductEditDTO productDTO) throws IOException {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
-
-        // Lấy danh sách ảnh hiện tại từ sản phẩm
+    
+        if (!product.getProductName().equals(productDTO.getProductName()) && isProductNameDuplicate(productDTO.getProductName())) {
+            throw new IllegalArgumentException("Product name already exists: " + productDTO.getProductName());
+        }
+    
         Set<ImageData> currentImages = new HashSet<>();
         if (product.getImages() != null && !product.getImages().isEmpty()) {
             List<Long> currentImageIds = Arrays.stream(product.getImages().split(","))
                     .map(Long::valueOf)
-                    .toList();
+                    .collect(Collectors.toList());
             currentImages.addAll(imageDataRepository.findAllById(currentImageIds));
         }
-
-        // Danh sách ảnh mới từ DTO
-        Set<ImageData> newImages = new HashSet<>();
+    
         Set<String> newImageNames = new HashSet<>();
+        Set<ImageData> newImages = new HashSet<>();
+    
         if (productDTO.getImages() != null) {
             for (MultipartFile file : productDTO.getImages()) {
                 String newName = file.getOriginalFilename();
                 newImageNames.add(newName);
-
-                // Kiểm tra nếu tên ảnh đã tồn tại
+    
                 Optional<ImageData> existingImage = currentImages.stream()
                         .filter(img -> img.getName().equals(newName))
                         .findFirst();
-
+    
                 if (existingImage.isPresent()) {
-                    // Ảnh đã tồn tại, giữ lại
                     newImages.add(existingImage.get());
                 } else {
-                    // Ảnh mới, thêm vào cơ sở dữ liệu
                     ImageData newImage = imageDataRepository.save(
                             ImageData.builder()
                                     .name(newName)
@@ -166,18 +150,23 @@ public class ProductService {
                 }
             }
         }
-
-        // Xóa ảnh không còn trong danh sách mới
+    
         for (ImageData currentImage : currentImages) {
-            if (!newImageNames.contains(currentImage.getName())) {
-                boolean isReferenced = productRepository.existsByImageId(currentImage.getId().toString());
-                if (isReferenced) {
-                    imageDataRepository.deleteById(currentImage.getId());
-                }
+            if (!newImageNames.contains(currentImage.getName()) && 
+                !productDTO.getExistingImages().contains(currentImage.getId())) {
+                imageDataRepository.deleteById(currentImage.getId());
             }
         }
-
-        // Cập nhật các thuộc tính của sản phẩm
+    
+        Set<String> finalImageIds = new HashSet<>(productDTO.getExistingImages().stream()
+                .map(String::valueOf)
+                .collect(Collectors.toSet()));
+    
+        finalImageIds.addAll(newImages.stream()
+                .map(image -> String.valueOf(image.getId()))
+                .collect(Collectors.toSet()));
+    
+        product.setImages(String.join(",", finalImageIds));
         product.setProductName(productDTO.getProductName());
         product.setCategory(
                 categoryRepository.findById(productDTO.getCategoryId())
@@ -188,18 +177,9 @@ public class ProductService {
         product.setRingBelt(productDTO.getRingBelt());
         product.setMaterial(productDTO.getMaterial());
         product.setDiscount(productDTO.getDiscount());
-        product.setIsIncludeMasterDiamond(productDTO.getIsIncludeMasterDiamond());
-        product.setShape(productDTO.getShape());
-        product.setGender(productDTO.getGender());
-        Set<String> finalImageIds = newImages.stream()
-                .map(image -> String.valueOf(image.getId()))
-                .collect(Collectors.toSet());
-        product.setImages(String.join(",", finalImageIds));
-
         product.setIsFeatured(productDTO.getIsFeatured());
         product.setIsActive(productDTO.getIsActive());
-
-        // Lưu sản phẩm sau khi chỉnh sửa
+    
         return productRepository.save(product);
     }
 

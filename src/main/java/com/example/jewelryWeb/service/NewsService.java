@@ -87,7 +87,6 @@ public class NewsService {
                             .build());
         }
 
-        // Xử lý cập nhật ảnh thumbnail
         ImageData thumbnailData = null;
         if (newsDTO.getThumbnail() != null && !newsDTO.getThumbnail().isEmpty()) {
             thumbnailData = imageDataRepository.save(
@@ -97,7 +96,6 @@ public class NewsService {
                             .imageData(ImageUtils.compressImage(newsDTO.getThumbnail().getBytes()))
                             .build());
         }
-        // Cập nhật thông tin bài viết
         existingNews.setTitle(newsDTO.getTitle());
         existingNews.setContentHeader(newsDTO.getContentHeader());
         existingNews.setContentFooter(newsDTO.getContentFooter());

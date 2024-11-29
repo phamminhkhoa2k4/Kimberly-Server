@@ -1,5 +1,6 @@
 package com.example.jewelryWeb.repository;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>,JpaSpeci
     
     List<Product> findByCategory_CategoryId(Long categoryId);
 
-
+    boolean existsByProductName(String productName);
 
     @Query("SELECT p FROM Product p WHERE p.category = :category AND p.productId <> :productId")
     List<Product> findRelatedProductsByCategory(@Param("category") Category category, @Param("productId") Long productId);
@@ -30,7 +31,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>,JpaSpeci
 
 
     List<Product> findByProductNameContainingIgnoreCase(String name);
-
+    
 //    @Query("SELECT p FROM Product p WHERE p.id IN :ids")
 //    List<Product> findAllById(@Param("ids") List<Integer> ids);
 //    @Query("SELECT p FROM Product p WHERE "
