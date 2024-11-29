@@ -52,6 +52,8 @@ public class Product {
 
     private String Shape;
 
+    @Column(length = 10,columnDefinition = "NVARCHAR(MAX)")
+    private String gender;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

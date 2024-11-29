@@ -29,6 +29,15 @@ public class JemmiaService {
                         .type(jemmiaDTO.getImage().getContentType())
                         .imageData(ImageUtils.compressImage(jemmiaDTO.getImage().getBytes()))
                         .build());
+
+
+
+        ImageData thumbnailData = imageDataRepository.save(
+                ImageData.builder()
+                        .name(jemmiaDTO.getThumbnail().getOriginalFilename())
+                        .type(jemmiaDTO.getThumbnail().getContentType())
+                        .imageData(ImageUtils.compressImage(jemmiaDTO.getThumbnail().getBytes()))
+                        .build());
         Jemmia jemmia = Jemmia.builder()
                 .title(jemmiaDTO.getTitle())
                 .contentHeader(jemmiaDTO.getContentHeader())
@@ -38,6 +47,7 @@ public class JemmiaService {
                 .publishedAt(jemmiaDTO.getPublishedAt())
                 .isActive(jemmiaDTO.getIsActive())
                 .image(imageData.getId())
+                .thumbnail(thumbnailData.getId())
                 .build();
         return jemmiaRepository.save(jemmia);
     }
@@ -56,6 +66,16 @@ public class JemmiaService {
                             .imageData(ImageUtils.compressImage(jemmiaDTO.getImage().getBytes()))
                             .build());
         }
+        // Xử lý cập nhật ảnh thumbnail
+        ImageData thumbnailData = null;
+        if (jemmiaDTO.getThumbnail() != null && !jemmiaDTO.getThumbnail().isEmpty()) {
+            thumbnailData = imageDataRepository.save(
+                    ImageData.builder()
+                            .name(jemmiaDTO.getThumbnail().getOriginalFilename())
+                            .type(jemmiaDTO.getThumbnail().getContentType())
+                            .imageData(ImageUtils.compressImage(jemmiaDTO.getThumbnail().getBytes()))
+                            .build());
+        }
         existingJemmia.setTitle(jemmiaDTO.getTitle());
         existingJemmia.setContentHeader(jemmiaDTO.getContentHeader());
         existingJemmia.setContentFooter(jemmiaDTO.getContentFooter());
@@ -66,6 +86,13 @@ public class JemmiaService {
         if (imageData != null) {
             existingJemmia.setImage(imageData.getId());
         }
+
+
+        // Cập nhật ID ảnh thumbnail nếu có thay đổi
+        if (thumbnailData != null) {
+            existingJemmia.setThumbnail(thumbnailData.getId());
+        }
+
         return jemmiaRepository.save(existingJemmia);
     }
     public Jemmia getJemmiaById(Long id) {

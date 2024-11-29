@@ -17,6 +17,8 @@ public class Jemmia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "jemmia_id")
     private Long jemmia_id;
+
+    private long thumbnail;
     
     @Column(nullable = false)
     private String title;

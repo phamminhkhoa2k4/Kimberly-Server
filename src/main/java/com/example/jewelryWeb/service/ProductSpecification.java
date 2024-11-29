@@ -24,7 +24,7 @@ public class ProductSpecification {
 
     public static Specification<Product> hasGender(String gender) {
         return (root, query, cb) -> gender == null
-                ? null : cb.equal(root.join("category").get("gender"), gender);
+                ? null : cb.equal(root.get("gender"), gender);
     }
 
     public static Specification<Product> hasCategory(String categoryName) {

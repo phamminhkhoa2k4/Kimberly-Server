@@ -102,6 +102,7 @@ public class ProductService {
                 .isFeatured(productDTO.getIsFeatured())
                 .isActive(productDTO.getIsActive())
                 .Shape(productDTO.getShape())
+                .gender(productDTO.getGender())
                 .isIncludeMasterDiamond(productDTO.getIsIncludeMasterDiamond())
                 .build();
 
@@ -189,6 +190,7 @@ public class ProductService {
         product.setDiscount(productDTO.getDiscount());
         product.setIsIncludeMasterDiamond(productDTO.getIsIncludeMasterDiamond());
         product.setShape(productDTO.getShape());
+        product.setGender(productDTO.getGender());
         Set<String> finalImageIds = newImages.stream()
                 .map(image -> String.valueOf(image.getId()))
                 .collect(Collectors.toSet());

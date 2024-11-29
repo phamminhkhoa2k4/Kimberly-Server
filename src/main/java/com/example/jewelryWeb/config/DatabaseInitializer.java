@@ -23,56 +23,47 @@ public class DatabaseInitializer implements CommandLineRunner {
                 if (categoryRepository.count() == 0) {
                         Category root = Category.builder()
                                 .categoryName("Nhẫn")
-                                .gender(null)
                                 .parentCategory(null)
                                 .build();
                         root = categoryRepository.save(root);
 
                         Category maleRing = Category.builder()
                                 .categoryName("Nhẫn Nam")
-                                .gender("Nam")
                                 .parentCategory(root)
                                 .build();
 
                         Category femaleRing = Category.builder()
                                 .categoryName("Nhẫn Nữ")
-                                .gender("Nữ")
                                 .parentCategory(root)
                                 .build();
 
                         Category proposalRing = Category.builder()
                                 .categoryName("Nhẫn Cầu Hôn")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 
                         Category weddingRing = Category.builder()
                                 .categoryName("Nhẫn Cưới")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 
                         Category earrings = Category.builder()
                                 .categoryName("Bông Tai")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 
                         Category necklace = Category.builder()
                                 .categoryName("Vòng Cổ")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 
                         Category bracelet = Category.builder()
                                 .categoryName("Vòng Tay")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 
                         Category jewelryset = Category.builder()
                                 .categoryName("Bộ Trang Sức")
-                                .gender(null)
                                 .parentCategory(root)
                                 .build();
 

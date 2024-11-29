@@ -11,6 +11,7 @@ public class JemmiaDTO {
     private String title;
     private String contentHeader;
     private MultipartFile image;
+    private MultipartFile thumbnail;
     private String contentFooter;
     private LocalDateTime startDate;
     private LocalDateTime endDate;

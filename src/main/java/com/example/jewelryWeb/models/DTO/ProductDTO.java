@@ -24,4 +24,5 @@ public class ProductDTO {
     private Boolean isActive;
     private Boolean isIncludeMasterDiamond;
     private String shape;
+    private String gender;
 }

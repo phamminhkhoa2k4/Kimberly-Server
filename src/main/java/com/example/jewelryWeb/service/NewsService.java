@@ -40,7 +40,12 @@ public class NewsService {
                         .type(newsDTO.getImage().getContentType())
                         .imageData(ImageUtils.compressImage(newsDTO.getImage().getBytes()))
                         .build());
-
+        ImageData thumbnailData = imageDataRepository.save(
+                ImageData.builder()
+                        .name(newsDTO.getThumbnail().getOriginalFilename())
+                        .type(newsDTO.getThumbnail().getContentType())
+                        .imageData(ImageUtils.compressImage(newsDTO.getThumbnail().getBytes()))
+                        .build());
         News news = News.builder()
                 .title(newsDTO.getTitle())
                 .contentHeader(newsDTO.getContentHeader())
@@ -48,6 +53,7 @@ public class NewsService {
                 .publishedAt(newsDTO.getPublishedAt())
                 .isActive(newsDTO.getIsActive())
                 .image(imageData.getId())
+                .thumbnail(thumbnailData.getId())
                 .build();
 
         newsRepository.save(news);
@@ -81,6 +87,16 @@ public class NewsService {
                             .build());
         }
 
+        // Xử lý cập nhật ảnh thumbnail
+        ImageData thumbnailData = null;
+        if (newsDTO.getThumbnail() != null && !newsDTO.getThumbnail().isEmpty()) {
+            thumbnailData = imageDataRepository.save(
+                    ImageData.builder()
+                            .name(newsDTO.getThumbnail().getOriginalFilename())
+                            .type(newsDTO.getThumbnail().getContentType())
+                            .imageData(ImageUtils.compressImage(newsDTO.getThumbnail().getBytes()))
+                            .build());
+        }
         // Cập nhật thông tin bài viết
         existingNews.setTitle(newsDTO.getTitle());
         existingNews.setContentHeader(newsDTO.getContentHeader());
@@ -89,6 +105,10 @@ public class NewsService {
         existingNews.setIsActive(newsDTO.getIsActive());
         if (imageData != null) {
             existingNews.setImage(imageData.getId());
+        }
+
+        if (thumbnailData != null) {
+            existingNews.setThumbnail(thumbnailData.getId());
         }
 
         return newsRepository.save(existingNews);

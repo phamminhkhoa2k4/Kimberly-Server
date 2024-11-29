@@ -25,8 +25,7 @@ public class Category {
     @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String categoryName;
 
-    @Column(length = 10,columnDefinition = "NVARCHAR(MAX)")
-    private String gender;
+
 
     @ManyToOne
     @JsonIgnore // Ngăn chặn tuần tự hóa đệ quy

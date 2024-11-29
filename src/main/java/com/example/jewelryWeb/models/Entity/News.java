@@ -27,6 +27,8 @@ public class News {
 
     private long image;
 
+    private long thumbnail;
+
     @Column(columnDefinition = "TEXT")
     private String contentFooter;
 
