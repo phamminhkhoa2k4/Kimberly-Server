@@ -103,6 +103,7 @@ public class JemmiaService {
         Jemmia existingJemmia = jemmiaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Jemmia not found."));
         imageDataRepository.deleteById(existingJemmia.getImage());
+        imageDataRepository.deleteById(existingJemmia.getThumbnail());
         jemmiaRepository.delete(existingJemmia);
     }
 }

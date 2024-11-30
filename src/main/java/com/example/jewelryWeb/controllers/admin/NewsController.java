@@ -19,20 +19,19 @@ public class NewsController {
 
    
 
-    // Lấy tất cả tin tức
     @GetMapping
     public ResponseEntity<List<News>> getAllNews() {
         List<News> newsList = newsService.getAllNews();
         return ResponseEntity.ok(newsList);
     }
 
-    // Lấy tin tức theo ID
+
     @GetMapping("/{id}")
     public Optional<News> getNewsById(@PathVariable Long id) throws Exception {
         return newsService.getNewsById(id);
     }
 
-    // Thêm tin tức mới
+
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> createNews(@ModelAttribute NewsDTO newsDTO) {
         try {
@@ -46,7 +45,7 @@ public class NewsController {
         }
     }
 
-    // Cập nhật tin tức
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNews(@PathVariable Long id, @ModelAttribute NewsDTO newsDTO) {
         try {

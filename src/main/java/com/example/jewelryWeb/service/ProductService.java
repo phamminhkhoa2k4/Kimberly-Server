@@ -22,9 +22,17 @@ import com.example.jewelryWeb.models.DTO.ProductDTO;
 import com.example.jewelryWeb.models.Entity.Category;
 import com.example.jewelryWeb.models.Entity.Gender;
 import com.example.jewelryWeb.models.Entity.ImageData;
+import com.example.jewelryWeb.models.Entity.Material;
+import com.example.jewelryWeb.models.Entity.MetallicColor;
 import com.example.jewelryWeb.models.Entity.Product;
+import com.example.jewelryWeb.models.Entity.RingBelt;
+import com.example.jewelryWeb.models.Entity.Shape;
 import com.example.jewelryWeb.repository.CategoryRepository;
+import com.example.jewelryWeb.repository.MaterialRepository;
+import com.example.jewelryWeb.repository.MetallicColorRepository;
 import com.example.jewelryWeb.repository.ProductRepository;
+import com.example.jewelryWeb.repository.RingBeltRepository;
+import com.example.jewelryWeb.repository.ShapeRepository;
 import com.example.jewelryWeb.repository.StorageRepository;
 import com.example.jewelryWeb.util.ImageUtils;
 
@@ -36,18 +44,27 @@ public class ProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private StorageRepository imageDataRepository;
+    @Autowired
+    private MetallicColorRepository metallicColorRepository;
+    @Autowired
+    private RingBeltRepository ringBeltRepository;
+    @Autowired
+    private MaterialRepository materialRepository;
 
-    // Lấy tất cả sản phẩm
+    @Autowired
+    private ShapeRepository shapeRepository;
+
+
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // Lấy sản phẩm theo ID
+
     public Optional<Product> getProductById(Long productId) {
         return productRepository.findById(productId);
     }
 
-    // Thêm sản phẩm mới
+
     public Product addProduct(Product product) {
         return productRepository.save(product);
     }
@@ -60,9 +77,6 @@ public class ProductService {
         if (isProductNameDuplicate(productDTO.getProductName())) {
             throw new IllegalArgumentException("Product name already exists: " + productDTO.getProductName());
         }
-        Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Category not found with ID: " + productDTO.getCategoryId()));
         List<String> imageIds = new ArrayList<>();
         if (productDTO.getImages() != null) {
             for (MultipartFile file : productDTO.getImages()) {
@@ -78,17 +92,23 @@ public class ProductService {
 
         Product product = Product.builder()
                 .productName(productDTO.getProductName())
-                .category(category)
+                .category(categoryRepository.findById(productDTO.getCategoryId())
+                        .orElseThrow(() -> new RuntimeException("Category not found"))) 
                 .price(productDTO.getPrice())
-                .metallicColor(productDTO.getMetallicColor())
-                .ringBelt(productDTO.getRingBelt())
-                .material(productDTO.getMaterial())
+                .metallicColors(new HashSet<>(metallicColorRepository.findAllById(productDTO.getMetallicColorIds()))) 
+                .ringBelt(ringBeltRepository.findById(productDTO.getRingBelt())
+                        .orElseThrow(() -> new RuntimeException("RingBelt not found"))) 
+                .material(materialRepository.findById(productDTO.getMaterialId())
+                        .orElseThrow(() -> new RuntimeException("Material not found"))) 
                 .discount(productDTO.getDiscount())
-                .images(String.join(",", imageIds))
+                .images(String.join(",", imageIds)) 
                 .isFeatured(productDTO.getIsFeatured())
                 .isActive(productDTO.getIsActive())
+                .isIncludeMasterDiamond(productDTO.getIsIncludeMasterDiamond())
+                .shape(shapeRepository.findById(productDTO.getShapeId())
+                        .orElseThrow(() -> new RuntimeException("Shape not found"))) 
+                .male(productDTO.getIsMale()) 
                 .build();
-
         return productRepository.save(product);
     }
 
@@ -106,17 +126,20 @@ public class ProductService {
         }
         productRepository.delete(product);
     }
+
     public boolean isProductNameDuplicate(String productName) {
         return productRepository.existsByProductName(productName);
     }
+
     public Product editProduct(Long productId, ProductEditDTO productDTO) throws IOException {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
-    
-        if (!product.getProductName().equals(productDTO.getProductName()) && isProductNameDuplicate(productDTO.getProductName())) {
+
+        if (!product.getProductName().equals(productDTO.getProductName())
+                && isProductNameDuplicate(productDTO.getProductName())) {
             throw new IllegalArgumentException("Product name already exists: " + productDTO.getProductName());
         }
-    
+
         Set<ImageData> currentImages = new HashSet<>();
         if (product.getImages() != null && !product.getImages().isEmpty()) {
             List<Long> currentImageIds = Arrays.stream(product.getImages().split(","))
@@ -124,19 +147,19 @@ public class ProductService {
                     .collect(Collectors.toList());
             currentImages.addAll(imageDataRepository.findAllById(currentImageIds));
         }
-    
+
         Set<String> newImageNames = new HashSet<>();
         Set<ImageData> newImages = new HashSet<>();
-    
-        if (productDTO.getImages() != null) {
-            for (MultipartFile file : productDTO.getImages()) {
+
+        if (productDTO.getNewImages() != null) {
+            for (MultipartFile file : productDTO.getNewImages()) {
                 String newName = file.getOriginalFilename();
                 newImageNames.add(newName);
-    
+
                 Optional<ImageData> existingImage = currentImages.stream()
                         .filter(img -> img.getName().equals(newName))
                         .findFirst();
-    
+
                 if (existingImage.isPresent()) {
                     newImages.add(existingImage.get());
                 } else {
@@ -150,46 +173,59 @@ public class ProductService {
                 }
             }
         }
-    
+
         for (ImageData currentImage : currentImages) {
-            if (!newImageNames.contains(currentImage.getName()) && 
-                !productDTO.getExistingImages().contains(currentImage.getId())) {
+            if (!newImageNames.contains(currentImage.getName()) &&
+                    !productDTO.getExistingImages().contains(currentImage.getId())) {
                 imageDataRepository.deleteById(currentImage.getId());
             }
         }
-    
+
         Set<String> finalImageIds = new HashSet<>(productDTO.getExistingImages().stream()
                 .map(String::valueOf)
                 .collect(Collectors.toSet()));
-    
+
         finalImageIds.addAll(newImages.stream()
                 .map(image -> String.valueOf(image.getId()))
                 .collect(Collectors.toSet()));
-    
-        product.setImages(String.join(",", finalImageIds));
+
+        product.setImages(String.join(",", finalImageIds)); 
         product.setProductName(productDTO.getProductName());
         product.setCategory(
                 categoryRepository.findById(productDTO.getCategoryId())
                         .orElseThrow(() -> new IllegalArgumentException(
                                 "Category not found with ID: " + productDTO.getCategoryId())));
         product.setPrice(productDTO.getPrice());
-        product.setMetallicColor(productDTO.getMetallicColor());
-        product.setRingBelt(productDTO.getRingBelt());
-        product.setMaterial(productDTO.getMaterial());
+        product.setMetallicColors(new HashSet<>(metallicColorRepository.findAllById(productDTO.getMetallicColorIds()))); 
+        product.setRingBelt(
+            ringBeltRepository.findById(productDTO.getRingBelt())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Material not found with ID: " + productDTO.getMaterialId())));
+        product.setMaterial(
+                materialRepository.findById(productDTO.getMaterialId())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Material not found with ID: " + productDTO.getMaterialId())));
         product.setDiscount(productDTO.getDiscount());
         product.setIsFeatured(productDTO.getIsFeatured());
         product.setIsActive(productDTO.getIsActive());
-    
+        product.setShape(
+                shapeRepository.findById(productDTO.getShapeId())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Shape not found with ID: " + productDTO.getShapeId())));
+        product.setMale(productDTO.getIsMale()); // Set gender flag based on the DTO
+
         return productRepository.save(product);
     }
 
-    public List<Product> filterProducts(List<String> materials, List<String> metallicColor, String gender, BigDecimal minPrice,
-            BigDecimal maxPrice, String categoryName ,String sortBy) {
+    public List<Product> filterProducts(List<String> materials, List<String> metallicColor, String gender,
+            BigDecimal minPrice,
+            BigDecimal maxPrice, String categoryName, String sortBy) {
         Specification<Product> spec = Specification.where(ProductSpecification.hasMaterial(materials))
                 .and(ProductSpecification.hasCategory(categoryName))
                 .and(ProductSpecification.hasMetallicColor(metallicColor))
                 .and(ProductSpecification.hasGender(gender))
-                .and(ProductSpecification.isWithinPriceRange(minPrice.multiply(BigDecimal.valueOf(1000000)), maxPrice.multiply(BigDecimal.valueOf(1000000))));
+                .and(ProductSpecification.isWithinPriceRange(minPrice.multiply(BigDecimal.valueOf(1000000)),
+                        maxPrice.multiply(BigDecimal.valueOf(1000000))));
 
         Sort sort = Sort.unsorted();
         if (sortBy != null) {
@@ -201,30 +237,47 @@ public class ProductService {
             };
         }
 
-        return productRepository.findAll(spec,sort);
+        return productRepository.findAll(spec, sort);
     }
 
-    public List<Product> getRelatedProducts(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+    // public List<Product> getRelatedProducts(Long productId) {
+    // Product product = productRepository.findById(productId)
+    // .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        Category category = product.getCategory();
+    // Category category = product.getCategory();
 
-        Set<Product> relatedProducts = new HashSet<>();
-        relatedProducts.addAll(productRepository.findRelatedProductsByCategory(category, productId));
-        relatedProducts.addAll(productRepository.findRelatedProductsByMetallicColor(product.getMetallicColor(), productId));
-        relatedProducts.addAll(productRepository.findRelatedProductsByMaterial(product.getMaterial(), productId));
+    // Set<Product> relatedProducts = new HashSet<>();
+    // relatedProducts.addAll(productRepository.findRelatedProductsByCategory(category,
+    // productId));
+    // relatedProducts
+    // .addAll(productRepository.findRelatedProductsByMetallicColor(product.getMetallicColor(),
+    // productId));
+    // relatedProducts.addAll(productRepository.findRelatedProductsByMaterial(product.getMaterial(),
+    // productId));
 
-        return new ArrayList<>(relatedProducts);
-    }
-
+    // return new ArrayList<>(relatedProducts);
+    // }
 
     public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
     }
 
-
     public List<Product> getProductsByCategoryId(Long categoryId) {
         return productRepository.findByCategory_CategoryId(categoryId);
+    }
+    public List<Material> getMaterials() {
+        return materialRepository.findAll();
+    }
+    public List<MetallicColor> getMetallicColors() {
+        return metallicColorRepository.findAll();
+    }
+    public List<Shape> getShapes() {
+        return shapeRepository.findAll();
+    }
+    public List<RingBelt> getRingBelts(){
+        return ringBeltRepository.findAll();
+    }
+    public List<Category> getCategories(){
+        return categoryRepository.findAll();
     }
 }

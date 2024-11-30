@@ -24,6 +24,8 @@ public class Diamond {
 
     private String colorGrade;
 
+    private String Shape;
+    
     private String clarity;
 
     private String cutting;

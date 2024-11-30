@@ -125,6 +125,7 @@ public class NewsService {
         News news=newsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("News not found with ID: " + id));
         imageDataRepository.deleteById(news.getImage());
+        imageDataRepository.deleteById(news.getThumbnail());
         newsRepository.deleteById(id);
     }
 

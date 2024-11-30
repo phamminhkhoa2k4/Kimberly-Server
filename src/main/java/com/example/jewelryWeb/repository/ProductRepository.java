@@ -19,14 +19,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>,JpaSpeci
 
     boolean existsByProductName(String productName);
 
-    @Query("SELECT p FROM Product p WHERE p.category = :category AND p.productId <> :productId")
-    List<Product> findRelatedProductsByCategory(@Param("category") Category category, @Param("productId") Long productId);
+    // @Query("SELECT p FROM Product p WHERE p.category = :category AND p.productId <> :productId")
+    // List<Product> findRelatedProductsByCategory(@Param("category") Category category, @Param("productId") Long productId);
 
-    @Query("SELECT p FROM Product p WHERE p.metallicColor = :metallicColor AND p.productId <> :productId")
-    List<Product> findRelatedProductsByMetallicColor(@Param("metallicColor") String metallicColor, @Param("productId") Long productId);
+    // @Query("SELECT p FROM Product p WHERE p.metallicColor = :metallicColor AND p.productId <> :productId")
+    // List<Product> findRelatedProductsByMetallicColor(@Param("metallicColor") String metallicColor, @Param("productId") Long productId);
 
-    @Query("SELECT p FROM Product p WHERE p.material = :material AND p.productId <> :productId")
-    List<Product> findRelatedProductsByMaterial(@Param("material") String material, @Param("productId") Long productId);
+    // @Query("SELECT p FROM Product p WHERE p.material = :material AND p.productId <> :productId")
+    // List<Product> findRelatedProductsByMaterial(@Param("material") String material, @Param("productId") Long productId);
 
 
 

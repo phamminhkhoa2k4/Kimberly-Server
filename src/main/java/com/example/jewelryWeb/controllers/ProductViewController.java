@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -75,9 +78,29 @@ public class ProductViewController {
     }
 
 
-    @GetMapping("/related/{id}")
-    public ResponseEntity<List<Product>> getRelatedProducts(@PathVariable Long id) {
-        List<Product> relatedProducts = productService.getRelatedProducts(id);
-        return ResponseEntity.ok(relatedProducts);
+    // @GetMapping("/related/{id}")
+    // public ResponseEntity<List<Product>> getRelatedProducts(@PathVariable Long id) {
+    //     List<Product> relatedProducts = productService.getRelatedProducts(id);
+    //     return ResponseEntity.ok(relatedProducts);
+    // }
+    @GetMapping("/material")
+    public List<Material> getMaterials() {
+        return productService.getMaterials();
+    }
+    @GetMapping("/metallicColors")
+    public List<MetallicColor> getMetallicColors() {
+        return productService.getMetallicColors();
+    }
+    @GetMapping("/shape")
+    public List<Shape> getShapes() {
+        return productService.getShapes();
+    }
+    @GetMapping("/ringbelt")
+    public List<RingBelt> getRingBelts() {
+        return productService.getRingBelts();
+    }
+    @GetMapping("/category")
+    public List<Category> getCategories() {
+        return productService.getCategories();
     }
 }
