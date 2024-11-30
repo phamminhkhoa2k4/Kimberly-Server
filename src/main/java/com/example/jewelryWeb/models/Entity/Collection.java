@@ -24,11 +24,11 @@ public class Collection {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String image;
+    private long image;
     
-    private String banner;
+    private long banner;
 
-    private String avatar;
+    private long avatar;
 
 
     private Boolean isActive;

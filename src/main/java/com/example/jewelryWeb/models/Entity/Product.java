@@ -35,6 +35,7 @@ public class Product {
     @Column(columnDefinition = "NVARCHAR(MAX)")
     private String metallicColor;
 
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String ringBelt;
     @Column(columnDefinition = "NVARCHAR(MAX)")
     private String material;

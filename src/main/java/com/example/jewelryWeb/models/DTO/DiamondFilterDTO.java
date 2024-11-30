@@ -12,5 +12,6 @@ public class DiamondFilterDTO {
     private BigDecimal maxPrice;   
     private String size;       
     private String colorGrade;  
-    private String clarity;     
+    private String clarity;
+    private String shape;
 }

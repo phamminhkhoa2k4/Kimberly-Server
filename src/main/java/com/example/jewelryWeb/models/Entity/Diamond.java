@@ -18,15 +18,17 @@ public class Diamond {
     private Long diamondId;
 
     @Column(nullable = false)
-    private BigDecimal weight;
+    private Double weight;
 
-    private String size;
+    private Double size;
 
     private String colorGrade;
 
     private String clarity;
 
     private String cutting;
+
+    private String shape;
 
     @Column(nullable = false)
     private BigDecimal price;

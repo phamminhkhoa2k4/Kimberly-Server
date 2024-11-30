@@ -1,9 +1,12 @@
 package com.example.jewelryWeb.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.jewelryWeb.models.DTO.DiamondFilterDTO;
@@ -38,6 +41,7 @@ public class DiamondService {
             diamond.setColorGrade(updatedDiamond.getColorGrade());
             diamond.setClarity(updatedDiamond.getClarity());
             diamond.setCutting(updatedDiamond.getCutting());
+            diamond.setShape(updatedDiamond.getShape());
             diamond.setPrice(updatedDiamond.getPrice());
             return diamondRepository.save(diamond);
         }).orElseThrow(() -> new IllegalArgumentException("Diamond not found with id: " + diamondId));
@@ -47,15 +51,24 @@ public class DiamondService {
     public void deleteDiamond(Long diamondId) {
         diamondRepository.deleteById(diamondId);
     }
-    public List<Diamond> filterDiamonds(DiamondFilterDTO filterDTO) {
-        return diamondRepository.filterDiamonds(
-                filterDTO.getMinWeight(),
-                filterDTO.getMaxWeight(),
-                filterDTO.getMinPrice(),
-                filterDTO.getMaxPrice(),
-                filterDTO.getSize(),
-                filterDTO.getColorGrade(),
-                filterDTO.getClarity()
-        );
+    public List<Diamond> filterDiamonds(Double minCarat, Double maxCarat, Double minSize, Double maxSize, BigDecimal minPrice,BigDecimal maxPrice,String shape,String clarity,String color,String sortBy) {
+            Specification<Diamond> spec = Specification.where(DiamondSpecification.hasShape(shape))
+                .and(DiamondSpecification.hasClarity(clarity))
+                .and(DiamondSpecification.hasColor(color))
+                .and(DiamondSpecification.isWithinPriceRange(minPrice.multiply(BigDecimal.valueOf(100000)), maxPrice.multiply(BigDecimal.valueOf(100000))))
+                .and(DiamondSpecification.isWithinCaratRange(minCarat, maxCarat))
+                .and(DiamondSpecification.isWithinSizeRange(minSize, maxSize));
+
+        Sort sort = Sort.unsorted();
+        if (sortBy != null) {
+            sort = switch (sortBy) {
+                case "Mới Nhất" -> Sort.by(Sort.Direction.DESC, "createdAt");
+                case "Giá Cao Đến Thấp" -> Sort.by(Sort.Direction.DESC, "price");
+                case "Giá Thấp Đến Cao" -> Sort.by(Sort.Direction.ASC, "price");
+                default -> sort;
+            };
+        }
+
+        return diamondRepository.findAll(spec);
     }
 }

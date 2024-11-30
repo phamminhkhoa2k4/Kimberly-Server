@@ -3,6 +3,8 @@ package com.example.jewelryWeb.controllers.admin;
 import java.util.List;
 import java.io.IOException;
 import java.util.stream.Collectors;
+
+import com.example.jewelryWeb.models.DTO.CollectionDTO;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +26,11 @@ public class CollectionController {
     }
 
     // Tạo mới một collection
-    // @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    // public ResponseEntity<Collection> createCollection(@ModelAttribute CollectionDTO collectionDTO) {
-    //     Collection savedCollection = collectionService.saveCollection(collectionDTO);
-    //     return ResponseEntity.ok(savedCollection);
-    // }
+     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+     public ResponseEntity<Collection> createCollection(@ModelAttribute CollectionDTO collectionDTO) throws IOException {
+         Collection savedCollection = collectionService.saveCollection(collectionDTO);
+         return ResponseEntity.ok(savedCollection);
+     }
 
     // @PutMapping("/{id}")
     // public ResponseEntity<CollectionDTO> updateCollection(@PathVariable Long id, @RequestBody CollectionDTO collectionDTO) {
