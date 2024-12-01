@@ -62,16 +62,41 @@ public class DatabaseInitializer implements CommandLineRunner {
                                 System.out.println("Created sub-category: " + subCategory.getCategoryName());
                         }
                 }
+                // Initialize MetallicColor
+                if (metallicColorRepository.findById(1L).isEmpty()) {
+                        List<MetallicColor> metallicColors = List.of(
+                            MetallicColor.builder().colorName("Vàng Trắng").build(),
+                            MetallicColor.builder().colorName("Vàng Chanh").build(),
+                            MetallicColor.builder().colorName("Vàng Hồng").build()
+                        );
+                
+                        metallicColorRepository.saveAll(metallicColors);
+                        System.out.println("Initialized metallic colors.");
+                    } else {
+                        System.out.println("Metallic colors already initialized.");
+                    }
+                
+                    List<MetallicColor> allMetallicColors = metallicColorRepository.findAll();
+                
+                    for (MetallicColor metallicColor : allMetallicColors) {
+                        String correctedColorName = correctCharacterEncoding(metallicColor.getColorName());
 
+                        if (!metallicColor.getColorName().equals(correctedColorName)) {
+                            metallicColor.setColorName(correctedColorName);
+                            metallicColorRepository.save(metallicColor);
+                            System.out.println("Updated metallic color to: " + correctedColorName);
+                        }
+                    }
+                    
                 // Initialize Shape
-                if (shapeRepository.findById(1L).isEmpty()) { 
+                if (shapeRepository.findById(1L).isEmpty()) {
                         List<Shape> shapes = List.of(
                                         Shape.builder().shapeName("Tròn").build(),
                                         Shape.builder().shapeName("Vuông").build(),
                                         Shape.builder().shapeName("Oval").build(),
                                         Shape.builder().shapeName("Trái Tim").build());
 
-                        shapeRepository.saveAll(shapes); 
+                        shapeRepository.saveAll(shapes);
                         System.out.println("Initialized shapes.");
                 } else {
                         System.out.println("Shapes already initialized.");
@@ -89,31 +114,23 @@ public class DatabaseInitializer implements CommandLineRunner {
                         System.out.println("Materials already initialized.");
                 }
 
-                // Initialize MetallicColor
-                if (metallicColorRepository.findById(1L).isEmpty()) { // Kiểm tra dữ liệu đầu tiên
-                        List<MetallicColor> metallicColors = List.of(
-                                        MetallicColor.builder().colorName("Vàng Trắng").build(),
-                                        MetallicColor.builder().colorName("Vàng Chanh").build(),
-                                        MetallicColor.builder().colorName("Vàng Hồng").build());
-
-                        metallicColorRepository.saveAll(metallicColors); // Lưu toàn bộ danh sách
-                        System.out.println("Initialized metallic colors.");
-                } else {
-                        System.out.println("Metallic colors already initialized.");
-                }
- 
                 // Initialize RingBelt
-                if (ringBeltRepository.findById(1L).isEmpty()) { // Kiểm tra dữ liệu đầu tiên
+                if (ringBeltRepository.findById(1L).isEmpty()) {
                         List<RingBelt> ringBelts = List.of(
                                         RingBelt.builder().beltType("Đai Trơn").build(),
                                         RingBelt.builder().beltType("Đai Nhám").build(),
                                         RingBelt.builder().beltType("Đai Đính Xoàn").build());
 
-                        ringBeltRepository.saveAll(ringBelts); // Lưu toàn bộ danh sách
+                        ringBeltRepository.saveAll(ringBelts);
                         System.out.println("Initialized ring belts.");
                 } else {
                         System.out.println("Ring belts already initialized.");
                 }
                 System.out.println("Database initialization complete!");
         }
+        private String correctCharacterEncoding(String colorName) {
+                return colorName.replace("Vàng Tr?ng", "Vàng Trắng")
+                                .replace("Vàng Chanh", "Vàng Chanh")
+                                .replace("Vàng H?ng", "Vàng Hồng");
+            }
 }

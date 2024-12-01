@@ -19,14 +19,14 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    // Lấy tất cả sản phẩm
+
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
-    // Lấy sản phẩm theo ID
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)

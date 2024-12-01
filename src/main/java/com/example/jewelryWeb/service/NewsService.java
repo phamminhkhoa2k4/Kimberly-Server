@@ -137,4 +137,8 @@ public class NewsService {
                 .imageData(ImageUtils.compressImage(file.getBytes())).build());
         return imageData != null ? file.getOriginalFilename() : null;
     }
+
+    public List<News> searchByName(String name) {
+        return newsRepository.findByTitleContainingIgnoreCase(name);
+    }
 }
