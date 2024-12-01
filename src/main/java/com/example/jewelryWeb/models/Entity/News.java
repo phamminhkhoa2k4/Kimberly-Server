@@ -19,17 +19,17 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long newsId;
 
-    @Column(nullable = false)
+    @Column(nullable = false , columnDefinition = "NVARCHAR(MAX)")
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String contentHeader;
 
     private long image;
 
     private long thumbnail;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String contentFooter;
 
     private LocalDateTime publishedAt;

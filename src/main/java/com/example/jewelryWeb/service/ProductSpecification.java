@@ -2,11 +2,7 @@ package com.example.jewelryWeb.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import com.example.jewelryWeb.models.Entity.Category;
 import org.springframework.data.jpa.domain.Specification;
-
-import com.example.jewelryWeb.models.Entity.Gender;
 import com.example.jewelryWeb.models.Entity.Product;
 
 public class ProductSpecification {

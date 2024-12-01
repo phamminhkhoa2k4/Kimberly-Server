@@ -20,15 +20,15 @@ public class Jemmia {
 
     private long thumbnail;
     
-    @Column(nullable = false)
+    @Column(nullable = false , columnDefinition = "NVARCHAR(MAX)")
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String contentHeader;
 
     private long image;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String contentFooter;
 
     private LocalDateTime startDate;

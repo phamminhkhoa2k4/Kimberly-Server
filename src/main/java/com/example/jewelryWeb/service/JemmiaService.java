@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,5 +106,12 @@ public class JemmiaService {
         imageDataRepository.deleteById(existingJemmia.getImage());
         imageDataRepository.deleteById(existingJemmia.getThumbnail());
         jemmiaRepository.delete(existingJemmia);
+    }
+
+
+
+    public List<Jemmia> getAll(){
+
+        return jemmiaRepository.findAll();
     }
 }
