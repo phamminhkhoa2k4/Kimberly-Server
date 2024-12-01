@@ -10,7 +10,7 @@ import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;
 @RestController
-@RequestMapping("/api/jemmia")
+@RequestMapping("/api/admin/jemmia")
 public class JemmiaController {
     @Autowired
     private JemmiaService jemmiaService;
@@ -57,5 +57,12 @@ public class JemmiaController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Jemmia not found."));
         }
+    }
+
+
+    @GetMapping
+    public ResponseEntity<?> getAll(){
+       List<Jemmia> jemmia =  jemmiaService.getAll();
+        return ResponseEntity.ok(jemmia);
     }
 }

@@ -12,7 +12,7 @@ import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;
 @RestController
-@RequestMapping("/api/news")
+@RequestMapping("/api/admin/news")
 public class NewsController {
     @Autowired
     private NewsService newsService;
