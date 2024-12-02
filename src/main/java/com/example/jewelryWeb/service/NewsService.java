@@ -87,7 +87,6 @@ public class NewsService {
                             .build());
         }
 
-        // Xử lý cập nhật ảnh thumbnail
         ImageData thumbnailData = null;
         if (newsDTO.getThumbnail() != null && !newsDTO.getThumbnail().isEmpty()) {
             thumbnailData = imageDataRepository.save(
@@ -97,7 +96,6 @@ public class NewsService {
                             .imageData(ImageUtils.compressImage(newsDTO.getThumbnail().getBytes()))
                             .build());
         }
-        // Cập nhật thông tin bài viết
         existingNews.setTitle(newsDTO.getTitle());
         existingNews.setContentHeader(newsDTO.getContentHeader());
         existingNews.setContentFooter(newsDTO.getContentFooter());
@@ -127,6 +125,7 @@ public class NewsService {
         News news=newsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("News not found with ID: " + id));
         imageDataRepository.deleteById(news.getImage());
+        imageDataRepository.deleteById(news.getThumbnail());
         newsRepository.deleteById(id);
     }
 
@@ -137,5 +136,9 @@ public class NewsService {
                 .type(file.getContentType())
                 .imageData(ImageUtils.compressImage(file.getBytes())).build());
         return imageData != null ? file.getOriginalFilename() : null;
+    }
+
+    public List<News> searchByName(String name) {
+        return newsRepository.findByTitleContainingIgnoreCase(name);
     }
 }

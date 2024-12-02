@@ -8,71 +8,129 @@ import org.springframework.stereotype.Component;
 
 import com.example.jewelryWeb.models.Entity.Category;
 import com.example.jewelryWeb.models.Entity.Gender;
+import com.example.jewelryWeb.models.Entity.Shape;
+import com.example.jewelryWeb.models.Entity.Material;
+import com.example.jewelryWeb.models.Entity.MetallicColor;
+import com.example.jewelryWeb.models.Entity.RingBelt;
 import com.example.jewelryWeb.repository.CategoryRepository;
+import com.example.jewelryWeb.repository.ShapeRepository;
+import com.example.jewelryWeb.repository.MaterialRepository;
+import com.example.jewelryWeb.repository.MetallicColorRepository;
+import com.example.jewelryWeb.repository.RingBeltRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class DatabaseInitializer implements CommandLineRunner {
+
         private final CategoryRepository categoryRepository;
+        private final ShapeRepository shapeRepository;
+        private final MaterialRepository materialRepository;
+        private final MetallicColorRepository metallicColorRepository;
+        private final RingBeltRepository ringBeltRepository;
 
         @Override
         public void run(String... args) throws Exception {
-                // Kiểm tra nếu bảng Category trống
-                if (categoryRepository.count() == 0) {
-                        Category root = Category.builder()
-                                .categoryName("Nhẫn")
-                                .parentCategory(null)
-                                .build();
-                        root = categoryRepository.save(root);
 
-                        Category maleRing = Category.builder()
-                                .categoryName("Nhẫn Nam")
-                                .parentCategory(root)
-                                .build();
+                // Initialize Categories
+                Optional<Category> rootCategoryOpt = categoryRepository.findById(1L);
+                Category rootCategory;
 
-                        Category femaleRing = Category.builder()
-                                .categoryName("Nhẫn Nữ")
-                                .parentCategory(root)
-                                .build();
-
-                        Category proposalRing = Category.builder()
-                                .categoryName("Nhẫn Cầu Hôn")
-                                .parentCategory(root)
-                                .build();
-
-                        Category weddingRing = Category.builder()
-                                .categoryName("Nhẫn Cưới")
-                                .parentCategory(root)
-                                .build();
-
-                        Category earrings = Category.builder()
-                                .categoryName("Bông Tai")
-                                .parentCategory(root)
-                                .build();
-
-                        Category necklace = Category.builder()
-                                .categoryName("Vòng Cổ")
-                                .parentCategory(root)
-                                .build();
-
-                        Category bracelet = Category.builder()
-                                .categoryName("Vòng Tay")
-                                .parentCategory(root)
-                                .build();
-
-                        Category jewelryset = Category.builder()
-                                .categoryName("Bộ Trang Sức")
-                                .parentCategory(root)
-                                .build();
-
-                        // Lưu các category con
-                        categoryRepository.saveAll(List.of(maleRing, femaleRing, proposalRing, weddingRing, earrings, necklace, bracelet, jewelryset));
-
-                        System.out.println("Database initialized successfully with categories!");
+                if (rootCategoryOpt.isEmpty()) {
+                        rootCategory = Category.builder()
+                                        .categoryName("Nhẫn")
+                                        .parentCategory(null)
+                                        .build();
+                        rootCategory = categoryRepository.save(rootCategory);
                 } else {
-                        System.out.println("Categories already exist in the database. Skipping initialization.");
+                        rootCategory = rootCategoryOpt.get();
                 }
+
+                List<Category> subCategories = List.of(
+                                Category.builder().categoryName("Nhẫn Cầu Hôn").parentCategory(rootCategory).build(),
+                                Category.builder().categoryName("Nhẫn Cưới").parentCategory(rootCategory).build(),
+                                Category.builder().categoryName("Bông Tai").parentCategory(rootCategory).build(),
+                                Category.builder().categoryName("Vòng Cổ").parentCategory(rootCategory).build(),
+                                Category.builder().categoryName("Vòng Tay").parentCategory(rootCategory).build(),
+                                Category.builder().categoryName("Bộ Trang Sức").parentCategory(rootCategory).build());
+
+                for (Category subCategory : subCategories) {
+                        if (categoryRepository.findByCategoryNameAndParentCategory(subCategory.getCategoryName(),
+                                        rootCategory).isEmpty()) {
+                                categoryRepository.save(subCategory);
+                                System.out.println("Created sub-category: " + subCategory.getCategoryName());
+                        }
+                }
+                // Initialize MetallicColor
+                if (metallicColorRepository.findById(1L).isEmpty()) {
+                        List<MetallicColor> metallicColors = List.of(
+                            MetallicColor.builder().colorName("Vàng Trắng").build(),
+                            MetallicColor.builder().colorName("Vàng Chanh").build(),
+                            MetallicColor.builder().colorName("Vàng Hồng").build()
+                        );
+                
+                        metallicColorRepository.saveAll(metallicColors);
+                        System.out.println("Initialized metallic colors.");
+                    } else {
+                        System.out.println("Metallic colors already initialized.");
+                    }
+                
+                    List<MetallicColor> allMetallicColors = metallicColorRepository.findAll();
+                
+                    for (MetallicColor metallicColor : allMetallicColors) {
+                        String correctedColorName = correctCharacterEncoding(metallicColor.getColorName());
+
+                        if (!metallicColor.getColorName().equals(correctedColorName)) {
+                            metallicColor.setColorName(correctedColorName);
+                            metallicColorRepository.save(metallicColor);
+                            System.out.println("Updated metallic color to: " + correctedColorName);
+                        }
+                    }
+                    
+                // Initialize Shape
+                if (shapeRepository.findById(1L).isEmpty()) {
+                        List<Shape> shapes = List.of(
+                                        Shape.builder().shapeName("Tròn").build(),
+                                        Shape.builder().shapeName("Vuông").build(),
+                                        Shape.builder().shapeName("Oval").build(),
+                                        Shape.builder().shapeName("Trái Tim").build());
+
+                        shapeRepository.saveAll(shapes);
+                        System.out.println("Initialized shapes.");
+                } else {
+                        System.out.println("Shapes already initialized.");
+                }
+
+                // Initialize Material
+                if (materialRepository.findById(1L).isEmpty()) {
+                        List<Material> materials = List.of(
+                                        Material.builder().materialName("Vàng 18k").build(),
+                                        Material.builder().materialName("Hk").build());
+
+                        materialRepository.saveAll(materials);
+                        System.out.println("Initialized materials.");
+                } else {
+                        System.out.println("Materials already initialized.");
+                }
+
+                // Initialize RingBelt
+                if (ringBeltRepository.findById(1L).isEmpty()) {
+                        List<RingBelt> ringBelts = List.of(
+                                        RingBelt.builder().beltType("Đai Trơn").build(),
+                                        RingBelt.builder().beltType("Đai Nhám").build(),
+                                        RingBelt.builder().beltType("Đai Đính Xoàn").build());
+
+                        ringBeltRepository.saveAll(ringBelts);
+                        System.out.println("Initialized ring belts.");
+                } else {
+                        System.out.println("Ring belts already initialized.");
+                }
+                System.out.println("Database initialization complete!");
         }
+        private String correctCharacterEncoding(String colorName) {
+                return colorName.replace("Vàng Tr?ng", "Vàng Trắng")
+                                .replace("Vàng Chanh", "Vàng Chanh")
+                                .replace("Vàng H?ng", "Vàng Hồng");
+            }
 }

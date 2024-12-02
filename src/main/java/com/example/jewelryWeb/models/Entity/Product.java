@@ -1,14 +1,13 @@
 package com.example.jewelryWeb.models.Entity;
 
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "product")
@@ -22,23 +21,28 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @Column(nullable = false,columnDefinition = "NVARCHAR(MAX)")
+    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String productName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonIgnore
+
     private Category category;
 
     @Column(nullable = false)
     private BigDecimal price;
-    @Column(columnDefinition = "NVARCHAR(MAX)")
-    private String metallicColor;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
-    private String ringBelt;
-    @Column(columnDefinition = "NVARCHAR(MAX)")
-    private String material;
+    @ManyToMany
+    @JoinTable(name = "product_metallic_color", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "metallic_color_id"))
+    private Set<MetallicColor> metallicColors;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ring_belt_id")
+    private RingBelt ringBelt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "material_id", nullable = true)
+    private Material material;
 
     private Float discount;
 
@@ -51,10 +55,11 @@ public class Product {
 
     private Boolean isIncludeMasterDiamond;
 
-    private String Shape;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "shape_id", nullable = true)
+    private Shape shape;
 
-    @Column(length = 10,columnDefinition = "NVARCHAR(MAX)")
-    private String gender;
+    private boolean male;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -62,6 +67,7 @@ public class Product {
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "products")
+    @JsonIgnore
     private Set<Collection> collections;
 
     @PrePersist
