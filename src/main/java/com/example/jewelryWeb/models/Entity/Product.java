@@ -67,6 +67,7 @@ public class Product {
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "products")
+    @JsonIgnore
     private Set<Collection> collections;
 
     @PrePersist

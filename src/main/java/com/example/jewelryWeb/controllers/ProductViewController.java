@@ -19,9 +19,6 @@ public class ProductViewController {
     @Autowired
     private ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     @GetMapping("ring")
     public ResponseEntity<List<ProductKDTO>> getAllRing() {

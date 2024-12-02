@@ -23,8 +23,6 @@ public class Diamond {
     private Double size;
 
     private String colorGrade;
-
-    private String Shape;
     
     private String clarity;
 

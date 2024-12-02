@@ -4,6 +4,8 @@ import lombok.*;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -39,5 +41,6 @@ public class Collection {
         joinColumns = @JoinColumn(name = "collection_id"),
         inverseJoinColumns = @JoinColumn(name = "product_id")
     )
+
     private Set<Product> products;
 }
