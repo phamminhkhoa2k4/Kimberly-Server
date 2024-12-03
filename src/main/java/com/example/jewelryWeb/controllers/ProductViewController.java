@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.jewelryWeb.models.DTO.ItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.example.jewelryWeb.models.DTO.ProductKDTO;
@@ -12,12 +14,16 @@ import com.example.jewelryWeb.models.DTO.ProductMapper;
 import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/product")
 public class ProductViewController {
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private SearchService SearchService;
 
 
     @GetMapping("ring")
@@ -126,6 +132,19 @@ public class ProductViewController {
         return ResponseEntity.ok(productKDTOs);
     }
 
+    @GetMapping("/search/{query}")
+    public ResponseEntity<List<ProductKDTO>> search(@PathVariable String query){
+        List<ProductKDTO> data = SearchService.searchItems(query);
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductKDTO> getProductById(@PathVariable Long id) {
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        ProductKDTO productKDTO = ProductMapper.toProductKDTO(product);
+        return ResponseEntity.ok(productKDTO);
+    }
     @GetMapping("/material")
     public List<Material> getMaterials() {
         return productService.getMaterials();

@@ -91,10 +91,10 @@ public class DatabaseInitializer implements CommandLineRunner {
                 // Initialize Shape
                 if (shapeRepository.findById(1L).isEmpty()) {
                         List<Shape> shapes = List.of(
-                                        Shape.builder().shapeName("Tròn").build(),
-                                        Shape.builder().shapeName("Vuông").build(),
+                                        Shape.builder().shapeName("Round").build(),
+                                        Shape.builder().shapeName("Emerald").build(),
                                         Shape.builder().shapeName("Oval").build(),
-                                        Shape.builder().shapeName("Trái Tim").build());
+                                        Shape.builder().shapeName("Pear").build());
 
                         shapeRepository.saveAll(shapes);
                         System.out.println("Initialized shapes.");
@@ -129,8 +129,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                 System.out.println("Database initialization complete!");
         }
         private String correctCharacterEncoding(String colorName) {
-                return colorName.replace("Vàng Tr?ng", "Vàng Trắng")
+                return colorName.replace("Vàng Trắng", "Vàng Trắng")
                                 .replace("Vàng Chanh", "Vàng Chanh")
-                                .replace("Vàng H?ng", "Vàng Hồng");
+                                .replace("Vàng Hồng", "Vàng Hồng");
             }
 }

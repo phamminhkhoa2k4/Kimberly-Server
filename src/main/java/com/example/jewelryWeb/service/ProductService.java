@@ -210,7 +210,7 @@ public class ProductService {
     }
 
     public List<Product> filterProducts(
-            List<String> materials, 
+            List<String> materials,
             List<String> metallicColors,
             String gender,
             BigDecimal minPrice,
@@ -219,12 +219,12 @@ public class ProductService {
             String sortBy) {
         BigDecimal adjustedMinPrice = (minPrice != null) ? minPrice.multiply(BigDecimal.valueOf(1000)) : null;
         BigDecimal adjustedMaxPrice = (maxPrice != null) ? maxPrice.multiply(BigDecimal.valueOf(1000)) : null;
-        List<Long> materialIds = materials != null ? 
-            materialRepository.findByMaterialNameIn(materials).stream().map(Material::getMaterialId).collect(Collectors.toList()) : null;
+        List<Long> materialIds = materials != null ?
+                materialRepository.findByMaterialNameIn(materials).stream().map(Material::getMaterialId).collect(Collectors.toList()) : null;
         List<Long> metallicColorIds = metallicColors != null ?
-            metallicColorRepository.findByColorNameIn(metallicColors).stream().map(MetallicColor::getMetallicColorId).collect(Collectors.toList()) : null;
+                metallicColorRepository.findByColorNameIn(metallicColors).stream().map(MetallicColor::getMetallicColorId).collect(Collectors.toList()) : null;
         Long categoryId = categoryRepository.findByCategoryName(categoryName).map(Category::getCategoryId).orElse(null);
-        Boolean isMale = "male".equalsIgnoreCase(gender) ? Boolean.TRUE : ("female".equalsIgnoreCase(gender) ? Boolean.FALSE : null);
+        Boolean isMale = "Nam".equalsIgnoreCase(gender) ? Boolean.TRUE : ("Nữ".equalsIgnoreCase(gender) ? Boolean.FALSE : null);
         List<Product> products = productRepository.findAllByFilters(
                 materialIds, metallicColorIds, isMale, adjustedMinPrice, adjustedMaxPrice, categoryId);
         if (sortBy != null) {
