@@ -5,21 +5,41 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.example.jewelryWeb.models.DTO.ItemDTO;
 import com.example.jewelryWeb.models.DTO.ProductKDTO;
 import com.example.jewelryWeb.models.DTO.ProductMapper;
 import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/product")
 public class ProductViewController {
     @Autowired
     private ProductService productService;
-
-
+    @Autowired
+    private SearchService searchService;
+    @GetMapping("/{id}")
+public ResponseEntity<ProductKDTO> getProductById(@PathVariable Long id) {
+    Product product = productService.getProductById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+    ProductKDTO productKDTO = ProductMapper.toProductKDTO(product);
+    return ResponseEntity.ok(productKDTO);
+}
+ @GetMapping("/search")
+    public List<ItemDTO> searchItems(@RequestParam String name) {
+        return searchService.searchItems(name);
+    }
+// @GetMapping("/{id}")
+// public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+//     Product product = productService.getProductById(id)
+//             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+//     return ResponseEntity.ok(product);
+// }
     @GetMapping("ring")
     public ResponseEntity<List<ProductKDTO>> getAllRing() {
         List<Product> products = productService.getProductsByCategoryId(1L);

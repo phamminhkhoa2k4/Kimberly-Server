@@ -110,6 +110,10 @@ public class ProductService {
         if (product.getCollections() != null && !product.getCollections().isEmpty()) {
             throw new IllegalStateException("Product is part of a collection and cannot be deleted.");
         }
+        if (product.getMetallicColors() != null && !product.getMetallicColors().isEmpty()) {
+            product.getMetallicColors().clear();
+            productRepository.save(product); 
+        }
         if (product.getImages() != null && !product.getImages().isEmpty()) {
             String[] imageIds = product.getImages().split(",");
             for (String imageId : imageIds) {
@@ -118,6 +122,7 @@ public class ProductService {
         }
         productRepository.delete(product);
     }
+    
 
     public boolean isProductNameDuplicate(String productName) {
         return productRepository.existsByProductName(productName);
@@ -224,7 +229,7 @@ public class ProductService {
         List<Long> metallicColorIds = metallicColors != null ?
             metallicColorRepository.findByColorNameIn(metallicColors).stream().map(MetallicColor::getMetallicColorId).collect(Collectors.toList()) : null;
         Long categoryId = categoryRepository.findByCategoryName(categoryName).map(Category::getCategoryId).orElse(null);
-        Boolean isMale = "male".equalsIgnoreCase(gender) ? Boolean.TRUE : ("female".equalsIgnoreCase(gender) ? Boolean.FALSE : null);
+        Boolean isMale = "Nam".equalsIgnoreCase(gender) ? Boolean.TRUE : ("Nữ".equalsIgnoreCase(gender) ? Boolean.FALSE : null);
         List<Product> products = productRepository.findAllByFilters(
                 materialIds, metallicColorIds, isMale, adjustedMinPrice, adjustedMaxPrice, categoryId);
         if (sortBy != null) {

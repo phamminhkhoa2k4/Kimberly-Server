@@ -76,8 +76,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         // http://localhost:8080/api/product/filter?materials=Gold,Silver&metallicColors=Red,Blue&categoryName=Ring&sortBy=priceAsc&gender=male&minPrice=1000&maxPrice=5000
         @Query("SELECT p FROM Product p WHERE " +
                         "(:materialIds IS NULL OR p.material.materialId IN :materialIds) AND " +
-                        "(:metallicColorIds IS NULL OR EXISTS (SELECT 1 FROM p.metallicColors mc WHERE mc.metallicColorId IN :metallicColorIds)) AND "
-                        +
+                        "(:metallicColorIds IS NULL OR EXISTS (SELECT 1 FROM p.metallicColors mc WHERE mc.metallicColorId IN :metallicColorIds)) AND "+
                         "(:categoryId IS NULL OR p.category.categoryId = :categoryId) AND " +
                         "(:isMale IS NULL OR p.male = :isMale) AND " +
                         "(:minPrice IS NULL OR :maxPrice IS NULL OR p.price BETWEEN :minPrice AND :maxPrice)")

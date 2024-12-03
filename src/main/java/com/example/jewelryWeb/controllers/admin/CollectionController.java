@@ -3,14 +3,10 @@ package com.example.jewelryWeb.controllers.admin;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
-import java.util.stream.Collectors;
-
 import com.example.jewelryWeb.models.DTO.CollectionDTO;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-
-import com.example.jewelryWeb.models.DTO.CollectionDTO;
 import com.example.jewelryWeb.models.Entity.*;
 import com.example.jewelryWeb.service.*;
 import org.springframework.web.bind.annotation.*;

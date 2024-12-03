@@ -28,7 +28,7 @@ public class Category {
 
 
     @ManyToOne
-    @JsonIgnore // Ngăn chặn tuần tự hóa đệ quy
+    @JsonIgnore 
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)

@@ -16,7 +16,8 @@ public class Diamond {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long diamondId;
-
+    
+    private String diamondName;
     @Column(nullable = false)
     private Double weight;
 
